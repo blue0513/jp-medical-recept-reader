@@ -1,4 +1,5 @@
 (defvar recept-posframe-buffer " *recept-posframe")
+(defvar recept-buffer-showing nil)
 
 (defvar re-record-header
   (list
@@ -40,24 +41,52 @@
    "特定疾病"
    "カタカナ（氏名）"
    "患者の状態"))
+(defvar ho-record-header
+  (list ""))
+(defvar ko-record-header
+  (list ""))
+(defvar sy-record-header
+  (list ""))
 
 (defun build-message (result)
   (let* ((value ""))
     (dolist (element result)
-      (setq value (concat value (format "%s : %s\n" (car element) (cdr element)))))
-    (recept-show (format "%s" value))))
+      (setq value
+            (concat value
+                    (format "%s : %s\n" (car element) (cdr element)))))
+    value))
+
+(defun show-recept-info-of (record-header my-list)
+  (let* ((result (mapcar* #'cons record-header my-list))
+         (str (build-message result)))
+    (recept-show str)))
 
 (defun recept-show (str)
   (posframe-show
    recept-posframe-buffer
    :string str
    :no-properties nil
-   :background-color "black"))
+   :background-color "black")
+  (setq recept-buffer-showing t))
 
 (defun show-recept-info ()
-  (interactive)
   (let* ((line (thing-at-point 'line t))
          (my-list (split-string line ",")))
     (when (string= (car my-list) "RE")
-      (let* ((result (mapcar* #'cons re-record-header my-list)))
-        (build-message result)))))
+      (show-recept-info-of re-record-header my-list))
+    (when (string= (car my-list) "HO")
+      (show-recept-info-of ho-record-header my-list))
+    (when (string= (car my-list) "KO")
+      (show-recept-info-of ko-record-header my-list))
+    (when (string= (car my-list) "SY")
+      (show-recept-info-of sy-record-header my-list))))
+
+(defun hide-recept-info ()
+  (setq recept-buffer-showing nil)
+  (posframe-delete recept-posframe-buffer))
+
+(defun toggle-recept-info ()
+  (interactive)
+  (if recept-buffer-showing
+      (hide-recept-info)
+    (show-recept-info)))

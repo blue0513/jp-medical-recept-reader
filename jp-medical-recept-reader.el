@@ -1,6 +1,9 @@
 (defvar recept-posframe-buffer " *recept-posframe")
 (defvar recept-buffer-showing nil)
 
+(defvar ir-record-header
+  (list))
+
 (defvar re-record-header
   (list
    "レコード識別情報"
@@ -41,19 +44,71 @@
    "特定疾病"
    "カタカナ（氏名）"
    "患者の状態"))
+
+(defvar gr-record-header
+  (list))
+
 (defvar ho-record-header
-  (list ""))
+  (list
+   "レコード識別情報"
+   "保険者番号"
+   "被保険者証"
+   "被保険者証"
+   "診療実日数"
+   "合計点数"
+   "予備"
+   "食事療養回数"
+   "食事療養合計金額"
+   "職務上の事由"
+   "証明書番号"
+   "負担金額医療保険"
+   "減免区分"
+   "減額割合"
+   "減額金額"))
+
 (defvar ko-record-header
-  (list ""))
+  (list
+   "レコード識別情報"
+   "公費負担者番号"
+   "公費受給者番号"
+   "任意給付区分"
+   "診療実日数"
+   "合計点数"
+   "公費負担金額"
+   "公費給付対象外来一部負担金"
+   "公費給付対象入院一部負担金"
+   "予備"
+   "食事療養・生活療養回数"
+   "食事療養・生活療養合計金額"))
+
 (defvar sy-record-header
-  (list ""))
+  (list
+   "レコード識別情報"
+   "傷病名コード"
+   "診療開始日"
+   "転帰区分"
+   "修飾語コード"
+   "傷病名称"
+   "主傷病"
+   "補足コメント"))
+
+(defvar si-record-header
+  (list))
+
+(defvar to-record-header
+  (list))
+
+(defvar co-record-header
+  (list))
+
+(defvar sj-record-header
+  (list))
 
 (defun build-message (result)
   (let* ((value ""))
     (dolist (element result)
       (setq value
-            (concat value
-                    (format "%s : %s\n" (car element) (cdr element)))))
+            (concat value (format "%s : %s\n" (car element) (cdr element)))))
     value))
 
 (defun show-recept-info-of (record-header my-list)
@@ -72,14 +127,26 @@
 (defun show-recept-info ()
   (let* ((line (thing-at-point 'line t))
          (my-list (split-string line ",")))
+    (when (string= (car my-list) "IR")
+      (show-recept-info-of ir-record-header my-list))
     (when (string= (car my-list) "RE")
       (show-recept-info-of re-record-header my-list))
+    (when (string= (car my-list) "GR")
+      (show-recept-info-of gr-record-header my-list))
     (when (string= (car my-list) "HO")
       (show-recept-info-of ho-record-header my-list))
     (when (string= (car my-list) "KO")
       (show-recept-info-of ko-record-header my-list))
     (when (string= (car my-list) "SY")
-      (show-recept-info-of sy-record-header my-list))))
+      (show-recept-info-of sy-record-header my-list))
+    (when (string= (car my-list) "SI")
+      (show-recept-info-of si-record-header my-list))
+    (when (string= (car my-list) "TO")
+      (show-recept-info-of to-record-header my-list))
+    (when (string= (car my-list) "CO")
+      (show-recept-info-of co-record-header my-list))
+    (when (string= (car my-list) "SJ")
+      (show-recept-info-of sj-record-header my-list))))
 
 (defun hide-recept-info ()
   (setq recept-buffer-showing nil)
